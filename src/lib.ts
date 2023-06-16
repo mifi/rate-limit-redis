@@ -104,20 +104,21 @@ class RedisStore implements Store {
   }
 
   async runCommandWithRetry(key: string) {
-    const evalCommand = async () => this.sendCommand(
-      'EVALSHA',
-      await this.loadedScriptSha1,
-      '1',
-      this.prefixKey(key),
-      this.resetExpiryOnChange ? '1' : '0',
-      this.windowMs.toString(),
-    );
+    const evalCommand = async () =>
+      this.sendCommand(
+        "EVALSHA",
+        await this.loadedScriptSha1,
+        "1",
+        this.prefixKey(key),
+        this.resetExpiryOnChange ? "1" : "0",
+        this.windowMs.toString()
+      );
 
     try {
       return await evalCommand();
-    } catch (err) {
-      // todo distinguish different error types?
-      this.loadedScriptSha1 = await this.loadScript();
+    } catch {
+      // Todo distinguish different error types?
+      this.loadedScriptSha1 = this.loadScript();
       return evalCommand();
     }
   }
